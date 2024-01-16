@@ -1,7 +1,7 @@
 const inquirer = require('inquirer');
 const fs = require('fs');
 const { generateSvg } = require('./lib/generateSvg');
-const { makeShape } = require('./lib/makeShape');
+const { Triangle, Circle, Square } = require('./lib/shapes');
 
 function runApp() {
     inquirer
@@ -28,17 +28,33 @@ function runApp() {
               choices: ['triangle', 'circle', 'square'],
             },
           ])
-          .then((data) => {
-            const svgPath = './dist/logo.svg';
-            const finalLogo = makeShape(data);
-      
-            // Generate the svg logo here.
-            fs.writeFile(svgPath, generateSvg(finalLogo), (err) =>
-              err ? console.error(err) : console.log('Generated logo.svg')
-            );
-          })
-          .catch((err) => console.error(err));
-      }
-      
-      // Run the application
-      runApp();
+        }
+          function createShape(data) {
+            switch (data.logo-shape) {
+              case 'triangle':
+                const triangle = new Triangle();
+                triangle.setColor(data['logo-color']);
+                return triangle;
+              // Implement cases for 'circle' and 'square'
+            }
+          }
+          
+          function runApp() {
+            getUserInput()
+              .then((data) => {
+                const shape = createShape(data);
+                const svgPath = './dist/logo.svg';
+          
+                fs.writeFile(svgPath, generateSvg(shape), (err) => {
+                  if (err) {
+                    console.error(err);
+                  } else {
+                    console.log('Generated logo.svg');
+                  }
+                });
+              })
+              .catch((err) => console.error(err));
+          }
+          
+          // Run the application
+          runApp();
